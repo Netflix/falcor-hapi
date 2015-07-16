@@ -1,0 +1,31 @@
+{
+  "name": "falcor-hapi",
+  "version": "0.0.1",
+  "description": "A falcor server for hapi.",
+  "main": "src/index.js",
+  "homepage": "https://github.com/Netflix/falcor-hapi",
+  "author": {
+    "name": "Netflix",
+    "url": "https://github.com/Netflix/falcor-hapi/authors.txt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Netflix/falcor-hapi.git"
+  },
+  "licenses": [
+    {
+      "type": "Apache License, Version 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  ],
+  "scripts": {
+    "lint": "node ./node_modules/.bin/eslint src/"
+  },
+  "dependencies": {
+    "rx": "~2.3.24",
+    "boom": "^2.7.1"
+  },
+  "devDependencies": {
+    "eslint": "^0.21.0"
+  }
+}
