@@ -23,7 +23,6 @@ FalcorEndpoint.dataSourceRoute = function(getDataSource) {
         } else if (context.method === "call") {
             obs = dataSource[context.method](context.callPath, context.arguments, context.pathSuffixes, context.paths);
         } else {
-            console.log("foo", [].concat(context.paths));
             obs = dataSource[context.method]([].concat(context.paths));
         }
 
