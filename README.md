@@ -21,7 +21,7 @@ app.connection({
 app.route({
     method: ['GET', 'POST'],
     path: '/model.json',
-    handler: FalcorServer.modelRoute(function(req, res) {
+    handler: FalcorServer.dataSourceRoute(function(req, res) {
         return new TestRouter();
     })
 );
