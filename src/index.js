@@ -25,9 +25,8 @@ FalcorEndpoint.dataSourceRoute = function(getDataSource) {
         } else {
             obs = dataSource[context.method]([].concat(context.paths));
         }
-
-        obs.subscribe(function(jsong) {
-            reply(jsong);
+        obs.subscribe(function(jsonGraphEnvelope) {
+            reply(jsonGraphEnvelope);
         }, function(err) {
             reply(err);
         });

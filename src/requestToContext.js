@@ -42,8 +42,8 @@ module.exports = function requestToContext(req) {
     else if (req.method === "post") {
         context = postContext(req);
     }
-    if (typeof context.path === "string") {
-        context.path = JSON.parse(context.path);
+    if (typeof context.paths === "string") {
+        context.paths = JSON.parse(context.paths);
     }
     return context;
 };
