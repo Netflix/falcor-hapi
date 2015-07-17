@@ -10,7 +10,6 @@ Minimalistic example
 var FalcorServer = require('falcor-hapi');
 var Hapi = require('hapi');
 var TestRouter = <your router here>;
-var _TestRouter = new TestRouter();
 
 var app = new Hapi.Server();
 app.connection({
