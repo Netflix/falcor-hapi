@@ -1,7 +1,12 @@
 "use strict";
 var Boom = require("boom");
+var Joi = require("joi");
+var FalcorRouter = require("falcor-router");
+
 var requestToContext = require("./requestToContext");
 var FalcorEndpoint = module.exports = {};
+
+var internals = {};
 
 FalcorEndpoint.dataSourceRoute = function(getDataSource) {
     return function(req, reply) {
@@ -32,3 +37,60 @@ FalcorEndpoint.dataSourceRoute = function(getDataSource) {
         });
     };
 };
+
+FalcorEndpoint.register = function (server, options, next) {
+    server.handler('falcor', internals.falcorHandler);
+};
+
+FalcorEndpoint.register.attributes = {
+    pkg: require('../package.json')
+};
+
+internals.schema = Joi.object({
+    routes: Joi.array().items(
+        Joi.object().keys({
+          route: Joi.string().required(),
+          get: Joi.func().optional(),
+          set: Joi.func().optional(),
+          call: Joi.func().optional(),
+          authorize: Joi.func().optional()
+        }).or('get', 'set', 'call')
+    ).required(),
+    cacheRoutes: Joi.boolean().default(true),
+    options: Joi.object().optional(),
+    initialize: Joi.func().optional()
+});
+
+
+internals.falcorHandler = function(route, options) {
+    Joi.assert(options, internals.schema, 'Invalid falcor handler options (' + route.path + ')');
+    options = Joi.validate(options, internals.schema).value;
+
+    var StatefulRouter;
+    if(options.cacheRoutes) {
+        StatefulRouter = internals.createStatefulRouter(FalcorRouter.createClass(options.routes),options);
+    }
+
+    return FalcorEndpoint.dataSourceRoute(function(req, reply) {
+        if(!StatefulRouter) {
+            var Router = internals.createStatefulRouter(FalcorRouter.createClass(options.routes),options);
+            return new Router(req, reply);
+        }
+
+        return new StatefulRouter(req, reply);
+    });
+}
+
+internals.createStatefulRouter = function(StatelessRouter, options) {
+    function C(req,reply) {
+        this.req = req;
+        this.reply = reply;
+        if(options.initialize)
+            options.initialize.apply(this);
+    }
+
+    C.prototype = new StatelessRouter(options.options);
+    C.prototype.contructor = C;
+
+    return C;
+}
