@@ -23,7 +23,9 @@
   },
   "dependencies": {
     "rx": "~2.3.24",
-    "boom": "^2.7.1"
+    "boom": "^2.7.1",
+    "joi": "^6.5.0",
+    "falcor-router": "git+ssh://git@github.com/Netflix/falcor-router.git"
   },
   "devDependencies": {
     "eslint": "^0.21.0"
