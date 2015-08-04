@@ -4,6 +4,7 @@ var getContext = function (req) {
     // todo: not sure if in the below line should copy this object, or force Joi validation conversion
     // perhaps it"s irrelevant, and this is more performant, verify.
     var context = req.query;
+
     // as far as i know, params cannot contain nested objects so this should be safe
     for (var key in context) {
         if ({}.hasOwnProperty.call(context, key)) {
@@ -17,21 +18,10 @@ var getContext = function (req) {
 };
 
 var postContext = function(req) {
-    var queryString = req.payload;
-    var context = {};
-    // todo: improve this
-    if (queryString) {
-        context = queryString.split("&").reduce(function(acc, q) {
-            var queryParam = q.split("=");
-            acc[queryParam[0]] = decodeURIComponent(queryParam[1]);
-            if (queryParam[0] === "path") {
-                // optional, Falcor endpoint will take care of that.
-                acc[queryParam[0]] = JSON.parse(acc[queryParam[0]]);
-            }
-            return acc;
-        }, {});
-    }
-    return context;
+    var context = req.payload;
+    context.jsonGraph = JSON.parse(context.jsonGraph);
+
+    return  context;
 };
 
 module.exports = function requestToContext(req) {
