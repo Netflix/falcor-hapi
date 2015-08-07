@@ -19,7 +19,12 @@ var getContext = function (req) {
 
 var postContext = function(req) {
     var context = req.payload;
-    context.jsonGraph = JSON.parse(context.jsonGraph);
+    if(context.jsonGraph !== undefined) {
+        context.jsonGraph = JSON.parse(context.jsonGraph);
+    }
+    if(context.callPath !== undefined) {
+        context.callPath = JSON.parse(context.callPath);
+    }
 
     return  context;
 };

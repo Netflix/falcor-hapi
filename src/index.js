@@ -52,14 +52,14 @@ internals.schema = Joi.object({
           route: Joi.string().required(),
           get: Joi.func().optional(),
           set: Joi.func().optional(),
-          call: Joi.func().optional(),
-          authorize: Joi.func().optional()
+          call: Joi.func().optional()
         }).or('get', 'set', 'call')
     ).required(),
     cacheRoutes: Joi.boolean().default(true),
     options: Joi.object().optional(),
-    initialize: Joi.func().optional()
-});
+    initialize: Joi.func().optional(),
+    routerClass: Joi.func().optional()
+}).nand('initialize','routerClass');
 
 
 internals.falcorHandler = function(route, options) {
@@ -82,6 +82,11 @@ internals.falcorHandler = function(route, options) {
 }
 
 internals.createStatefulRouter = function(StatelessRouter, options) {
+    if(options.routerClass) {
+        internals.mixin(options.routerClass.prototype,new StatelessRouter(options.options));
+        return options.routerClass;
+    }
+
     function C(req,reply) {
         this.req = req;
         this.reply = reply;
@@ -93,4 +98,20 @@ internals.createStatefulRouter = function(StatelessRouter, options) {
     C.prototype.contructor = C;
 
     return C;
+}
+
+internals.mixin = function(target, source) {
+   target = target || {};
+
+   for (var prop in source) {
+       // Never override existing properties / methods from the target
+       if(target[prop] === undefined){
+           if (typeof source[prop] === 'object') {
+               target[prop] = internals.mixin(target[prop], source[prop]);
+           } else {
+               target[prop] = source[prop];
+           }
+       }
+   }
+   return target;
 }
