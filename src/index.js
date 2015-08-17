@@ -59,7 +59,7 @@ internals.schema = Joi.object({
     options: Joi.object().optional(),
     initialize: Joi.func().optional(),
     routerClass: Joi.func().optional()
-}).nand('initialize','routerClass');
+}).nand('initialize', 'routerClass');
 
 
 internals.falcorHandler = function(route, options) {
@@ -90,8 +90,9 @@ internals.createStatefulRouter = function(StatelessRouter, options) {
     function C(req,reply) {
         this.req = req;
         this.reply = reply;
-        if(options.initialize)
+        if(options.initialize) {
             options.initialize.apply(this);
+        }
     }
 
     C.prototype = new StatelessRouter(options.options);
@@ -105,7 +106,7 @@ internals.mixin = function(target, source) {
 
    for (var prop in source) {
        // Never override existing properties / methods from the target
-       if(target[prop] === undefined){
+       if(typeof target[prop] === "undefined"){
            if (typeof source[prop] === 'object') {
                target[prop] = internals.mixin(target[prop], source[prop]);
            } else {
