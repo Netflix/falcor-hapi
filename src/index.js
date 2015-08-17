@@ -39,11 +39,11 @@ FalcorEndpoint.dataSourceRoute = function(getDataSource) {
 };
 
 FalcorEndpoint.register = function (server, options, next) {
-    server.handler('falcor', internals.falcorHandler);
+    server.handler("falcor", internals.falcorHandler);
 };
 
 FalcorEndpoint.register.attributes = {
-    pkg: require('../package.json')
+    pkg: require("../package.json")
 };
 
 internals.schema = Joi.object({
@@ -53,41 +53,41 @@ internals.schema = Joi.object({
           get: Joi.func().optional(),
           set: Joi.func().optional(),
           call: Joi.func().optional()
-        }).or('get', 'set', 'call')
+        }).or("get", "set", "call")
     ).required(),
     cacheRoutes: Joi.boolean().default(true),
     options: Joi.object().optional(),
     initialize: Joi.func().optional(),
     routerClass: Joi.func().optional()
-}).nand('initialize', 'routerClass');
+}).nand("initialize", "routerClass");
 
 
 internals.falcorHandler = function(route, options) {
-    Joi.assert(options, internals.schema, 'Invalid falcor handler options (' + route.path + ')');
+    Joi.assert(options, internals.schema, "Invalid falcor handler options (" + route.path + ")");
     options = Joi.validate(options, internals.schema).value;
 
     var StatefulRouter;
     if(options.cacheRoutes) {
-        StatefulRouter = internals.createStatefulRouter(FalcorRouter.createClass(options.routes),options);
+        StatefulRouter = internals.createStatefulRouter(FalcorRouter.createClass(options.routes), options);
     }
 
     return FalcorEndpoint.dataSourceRoute(function(req, reply) {
         if(!StatefulRouter) {
-            var Router = internals.createStatefulRouter(FalcorRouter.createClass(options.routes),options);
+            var Router = internals.createStatefulRouter(FalcorRouter.createClass(options.routes), options);
             return new Router(req, reply);
         }
 
         return new StatefulRouter(req, reply);
     });
-}
+};
 
 internals.createStatefulRouter = function(StatelessRouter, options) {
     if(options.routerClass) {
-        internals.mixin(options.routerClass.prototype,new StatelessRouter(options.options));
+        internals.mixin(options.routerClass.prototype, new StatelessRouter(options.options));
         return options.routerClass;
     }
 
-    function C(req,reply) {
+    function C(req, reply) {
         this.req = req;
         this.reply = reply;
         if(options.initialize) {
@@ -99,7 +99,7 @@ internals.createStatefulRouter = function(StatelessRouter, options) {
     C.prototype.contructor = C;
 
     return C;
-}
+};
 
 internals.mixin = function(target, source) {
    target = target || {};
@@ -107,7 +107,7 @@ internals.mixin = function(target, source) {
    for (var prop in source) {
        // Never override existing properties / methods from the target
        if(typeof target[prop] === "undefined"){
-           if (typeof source[prop] === 'object') {
+           if (typeof source[prop] === "object") {
                target[prop] = internals.mixin(target[prop], source[prop]);
            } else {
                target[prop] = source[prop];
@@ -115,4 +115,4 @@ internals.mixin = function(target, source) {
        }
    }
    return target;
-}
+};
