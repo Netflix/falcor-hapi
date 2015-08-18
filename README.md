@@ -23,7 +23,7 @@ app.route({
     handler: FalcorServer.dataSourceRoute(function(req, res) {
         return new TestRouter();
     })
-);
+});
 app.start();
 
 ```
