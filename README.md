@@ -1,7 +1,7 @@
 # falcor-hapi
 Server middleware for falcor-hapi
 
-Working usage example of the basic repro in falcor-hapi-demo/
+Working usage example in [falcor-hapi-demo](https://github.com/netflix/falcor-hapi-demo) repo
 
 ## Usage
 Minimalistic example
