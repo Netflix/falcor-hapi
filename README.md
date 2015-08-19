@@ -35,5 +35,5 @@ npm run lint
 ```
 
 ## Todo
- * Create mocha test for regression and development instad of using example
+ * Create mocha test for regression and development instead of using example
 
