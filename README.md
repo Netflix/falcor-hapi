@@ -35,7 +35,7 @@ You can also register this module as an Hapi Plugin and use its provided Falcor 
  * Provides restful router with cached routes out of the box.
  * Both the Hapi Request and Reply are available within your routes as `this.req` and `this.reply`.
  * Validates your routes with JOI.
- * You can pass your own initialize method to the router.
+ * You can provide your own initialize method to the router.
  * Alternately, you can provide your own Router class and the handler will mixin the logic to cache your routes and the base Falcor router class.
 
  ```
@@ -58,7 +58,7 @@ You can also register this module as an Hapi Plugin and use its provided Falcor 
       handler: {
           falcor: {
               routes: routes,                                         // Your routes
-              cacheRoutes: true,                                      // Wether to cache your routes, default to true
+              cacheRoutes: true,                                      // Whether to cache your routes, default to true
               options: {debug: true},                                 // Option to give to Falcor router
               initialize: function() {                                // Optional initialize method
                  this.foo = this.req.payload.meaningoflife || 42;
