@@ -40,6 +40,8 @@ FalcorEndpoint.dataSourceRoute = function(getDataSource) {
 
 FalcorEndpoint.register = function (server, options, next) {
     server.handler("falcor", internals.falcorHandler);
+    
+    next();
 };
 
 FalcorEndpoint.register.attributes = {
