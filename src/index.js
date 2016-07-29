@@ -8,39 +8,49 @@ var FalcorEndpoint = module.exports = {};
 
 var internals = {};
 
+function isPromise(o) {
+    return (typeof Promise) === "function" ? o instanceof Promise : (typeof o.then) === "function";
+}
+
+function resolveDataSource(context, reply, dataSource) {
+    var obs;
+    // probably this should be sanity check function?
+    if (Object.keys(context).length === 0) {
+        return reply(Boom.badRequest("Request not supported"));
+    }
+    if (typeof context.method === "undefined" || context.method.length === 0) {
+        return reply(Boom.badRequest("No query method provided"));
+    }
+    if (typeof dataSource[context.method] === "undefined") {
+        return reply(Boom.badRequest("Data source does not implement the requested method"));
+    }
+    if (context.method === "set") {
+        obs = dataSource[context.method](context.jsonGraph);
+    } else if (context.method === "call") {
+        obs = dataSource[context.method](context.callPath, context.arguments, context.pathSuffixes, context.paths);
+    } else {
+        obs = dataSource[context.method]([].concat(context.paths));
+    }
+    obs.subscribe(function(jsonGraphEnvelope) {
+        reply(jsonGraphEnvelope);
+    }, function(err) {
+        reply(err);
+    });
+}
+
 FalcorEndpoint.dataSourceRoute = function(getDataSource) {
     return function(req, reply) {
-        var obs;
-        var dataSource = getDataSource(req, reply);
         var context = requestToContext(req);
-        // probably this should be sanity check function?
-        if (Object.keys(context).length === 0) {
-            return reply(Boom.badRequest("Request not supported"));
-        }
-        if (typeof context.method === "undefined" || context.method.length === 0) {
-            return reply(Boom.badRequest("No query method provided"));
-        }
-        if (typeof dataSource[context.method] === "undefined") {
-            return reply(Boom.badRequest("Data source does not implement the requested method"));
-        }
-        if (context.method === "set") {
-            obs = dataSource[context.method](context.jsonGraph);
-        } else if (context.method === "call") {
-            obs = dataSource[context.method](context.callPath, context.arguments, context.pathSuffixes, context.paths);
-        } else {
-            obs = dataSource[context.method]([].concat(context.paths));
-        }
-        obs.subscribe(function(jsonGraphEnvelope) {
-            reply(jsonGraphEnvelope);
-        }, function(err) {
-            reply(err);
-        });
+        var dataSource = getDataSource(req);
+        return isPromise(dataSource)
+            ? dataSource.then(function (ds) { resolveDataSource(context, reply, ds); })
+            : resolveDataSource(context, reply, dataSource);
     };
 };
 
 FalcorEndpoint.register = function (server, options, next) {
     server.handler("falcor", internals.falcorHandler);
-    
+
     next();
 };
 
@@ -64,9 +74,9 @@ internals.schema = Joi.object({
 }).nand("initialize", "routerClass");
 
 
-internals.falcorHandler = function(route, options) {
-    Joi.assert(options, internals.schema, "Invalid falcor handler options (" + route.path + ")");
-    options = Joi.validate(options, internals.schema).value;
+internals.falcorHandler = function(route, opts) {
+    Joi.assert(opts, internals.schema, "Invalid falcor handler options (" + route.path + ")");
+    var options = Joi.validate(opts, internals.schema).value;
 
     var StatefulRouter;
     if(options.cacheRoutes) {
@@ -103,8 +113,8 @@ internals.createStatefulRouter = function(StatelessRouter, options) {
     return C;
 };
 
-internals.mixin = function(target, source) {
-   target = target || {};
+internals.mixin = function(trgt, source) {
+   var target = trgt || {};
 
    for (var prop in source) {
        // Never override existing properties / methods from the target
