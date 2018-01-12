@@ -6,7 +6,7 @@ Working usage example in [falcor-hapi-demo](https://github.com/netflix/falcor-ha
 ## Usage
 Minimalistic example
 
-```
+```javascript
 var FalcorServer = require('falcor-hapi');
 var Hapi = require('hapi');
 var TestRouter = <your router here>;
@@ -38,7 +38,7 @@ You can also register this module as an Hapi Plugin and use its provided Falcor 
  * You can provide your own initialize method to the router.
  * Alternately, you can provide your own Router class and the handler will mixin the logic to cache your routes and the base Falcor router class.
 
- ```
+ ```javascript
  var Hapi = require('hapi');
 
  var app = new Hapi.Server();
@@ -74,7 +74,7 @@ You can also register this module as an Hapi Plugin and use its provided Falcor 
 
 ## Development
 Please run linting before pushing on repo
-```
+```bash
 npm run lint
 ```
 
